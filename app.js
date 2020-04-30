@@ -4,6 +4,15 @@ const productRoutes = require("./api/routes/products");
 const orderRoutes = require("./api/routes/orders");
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+
+
+//Connect to MongoDB
+mongoose.connect(
+    'mongodb+srv://gautham:' + process.env.MONGO_ATLAS_PW + '@gauthamcluster-vxd3h.mongodb.net/test?retryWrites=true&w=majority',
+    { useNewUrlParser: true }, () => {
+        console.log("DB Connected");
+    })
 
 //use morgon for logging
 app.use(morgan('dev'));

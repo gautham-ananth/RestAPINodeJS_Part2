@@ -11,6 +11,19 @@ app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+
+//CORS Resolve
+//* denotes allow all origin
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin., X-Requested-With, Content-Type, Accpet, Authorization');
+    if (req.method === 'OPTIONS') {
+        res.header('Access-Control-Allow-Methods', 'PUT,PATCH,DELETE,POST,GET');
+        return res.status(200).json({});
+    }
+    next();
+})
+
 //Middleware routes to handle requests
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);

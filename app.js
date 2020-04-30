@@ -3,9 +3,13 @@ const app = express();
 const productRoutes = require("./api/routes/products");
 const orderRoutes = require("./api/routes/orders");
 const morgan = require('morgan');
+const bodyParser = require('body-parser');
 
 //use morgon for logging
 app.use(morgan('dev'));
+//use bodyParser middleware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 //Middleware routes to handle requests
 app.use('/products', productRoutes);

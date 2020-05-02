@@ -9,10 +9,13 @@ const mongoose = require('mongoose');
 
 //Connect to MongoDB
 mongoose.connect(
-    'mongodb+srv://gautham:' + process.env.MONGO_ATLAS_PW + '@gauthamcluster-vxd3h.mongodb.net/test?retryWrites=true&w=majority',
-    { useNewUrlParser: true }, () => {
+    'mongodb://gautham:gautham123456@gauthamcluster-shard-00-00-vxd3h.mongodb.net:27017,gauthamcluster-shard-00-01-vxd3h.mongodb.net:27017,gauthamcluster-shard-00-02-vxd3h.mongodb.net:27017/test?ssl=true&replicaSet=GauthamCluster-shard-0&authSource=admin&retryWrites=true&w=majority',
+    { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true }, () => {
         console.log("DB Connected");
+        console.log(mongoose.connection.host);
+        console.log(mongoose.connection.port);
     })
+
 
 //use morgon for logging
 app.use(morgan('dev'));

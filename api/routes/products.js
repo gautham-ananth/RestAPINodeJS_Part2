@@ -19,10 +19,7 @@ router.get('/', (req, res, next) => {
             //     res.status(404).json({message : "No entries found"})
             // }
         })
-        .catch(error => {
-            console.error(error);
-            res.status(500).json(error);
-        })
+        .catch(errorHandler, res)
 })
 
 //Post a Product
@@ -45,10 +42,7 @@ router.post('/', async (req, res, next) => {
             })
     }
     catch (error) {
-        console.log("error when creating a product :", error);
-        res.status(500).json({
-            error: error
-        })
+        errorHandler(error, res)
     }
 })
 
@@ -106,5 +100,10 @@ router.delete('/:productID', (req, res, next) => {
 
 })
 
+function errorHandler(error, res) {
+    console.error(error);
+    res.status(500).json(error);
+
+}
 
 module.exports = router;

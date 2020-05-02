@@ -21,6 +21,8 @@ mongoose.Promise = global.Promise;
 
 //use morgon for logging
 app.use(morgan('dev'));
+//making uploads folder publicly available
+app.use('/uploads', express.static('uploads'));
 //use bodyParser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

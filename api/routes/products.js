@@ -1,6 +1,32 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const multer = require('multer');
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './uploads/');
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    }
+});
+
+const fileFilter = function (req, file, cb) {
+    //reject a file
+    if (file.mimetype === 'image/jpeg') {
+        cb(null, true);
+    }
+    else {
+        cb(null, false);
+    }
+}
+// const upload = multer({ dest: 'uploads/' });
+const upload = multer(
+    {
+        storage: storage,
+        limits: { fileSize: 1024 * 1024 * 5 },
+        fileFilter: fileFilter
+    });
 
 //import the product schema
 const Product = require('../models/product');
@@ -8,7 +34,7 @@ const Product = require('../models/product');
 //GET All Products
 router.get('/', (req, res, next) => {
     Product.find()
-        .select("name price _id")
+        .select("name price _id productImage ")
         .exec()
         .then(function (docs) {
             const response = {
@@ -17,6 +43,7 @@ router.get('/', (req, res, next) => {
                     return {
                         "name": doc.name,
                         "price": doc.price,
+                        productImage: doc.productImage,
                         "_id": doc.id,
                         "requests": {
                             "type": "GET",
@@ -38,11 +65,13 @@ router.get('/', (req, res, next) => {
 })
 
 //Post a Product
-router.post('/', async (req, res, next) => {
+router.post('/', upload.single('productImage'), async (req, res, next) => {
+    console.log(req.file)
     const product = new Product({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
-        price: req.body.price
+        price: req.body.price,
+        productImage: req.file.path
     });
     console.log("Product to create : ", JSON.stringify(product));
 
@@ -74,7 +103,7 @@ router.get('/:productID', async (req, res, next) => {
     try {
         const productID = req.params.productID;
         const getProduct = await Product.findById(productID)
-            .select("name price _id")
+            .select("name price _id productImage")
             .exec();
         console.log("From Database : " + getProduct);
         if (getProduct) {

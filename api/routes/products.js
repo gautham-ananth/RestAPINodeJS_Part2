@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const checkAuth = require('../middleware/check-auth');
 const multer = require('multer');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -65,7 +66,7 @@ router.get('/', (req, res, next) => {
 })
 
 //Post a Product
-router.post('/', upload.single('productImage'), async (req, res, next) => {
+router.post('/', upload.single('productImage'), checkAuth, async (req, res, next) => {
     console.log(req.file)
     const product = new Product({
         _id: new mongoose.Types.ObjectId(),

@@ -8,11 +8,26 @@ const Product = require('../models/product');
 //GET All Products
 router.get('/', (req, res, next) => {
     Product.find()
+        .select("name price _id")
         .exec()
-        .then(function (doc) {
-            console.log(doc);
+        .then(function (docs) {
+            const response = {
+                count: docs.length,
+                products: docs.map(doc => {
+                    return {
+                        "name": doc.name,
+                        "price": doc.price,
+                        "_id": doc.id,
+                        "requests": {
+                            "type": "GET",
+                            "url": "http://localhost:3000/products/" + doc._id
+                        }
+                    }
+                })
+            }
+            console.log(response);
             // if (doc.length >= 0) {
-            res.status(200).json(doc);
+            res.status(200).json(response);
             // }
             // else
             // {
@@ -37,8 +52,16 @@ router.post('/', async (req, res, next) => {
         console.log("after", result);
         res.status(201).json(
             {
-                message: "One product created",
-                createdProduct: result
+                message: "Producted Created Successfully",
+                createdProduct: {
+                    name: result.name,
+                    price: result.price,
+                    _id: result._id,
+                    reqest: {
+                        type: "GET",
+                        "url": "http://localhost:3000/products/" + result._id
+                    }
+                }
             })
     }
     catch (error) {
@@ -48,13 +71,20 @@ router.post('/', async (req, res, next) => {
 
 //Get one Product
 router.get('/:productID', async (req, res, next) => {
-    const productID = req.params.productID;
-    console.log("productID :", productID)
     try {
-        const getProduct = await Product.findById(productID).exec();
+        const productID = req.params.productID;
+        const getProduct = await Product.findById(productID)
+            .select("name price _id")
+            .exec();
         console.log("From Database : " + getProduct);
         if (getProduct) {
-            res.status(200).json(getProduct);
+            res.status(200).json({
+                product: getProduct,
+                request: {
+                    type: "GET All Products",
+                    url: "http://localhost:3000/products"
+                }
+            });
         }
         else {
             res.status(404).json(getProduct);
@@ -77,8 +107,13 @@ router.patch('/:productID', (req, res, next) => {
     Product.update({ _id: idToUpdate }, { $set: updateOps })
         .exec()
         .then(data => {
-            console.log(data);
-            res.status(200).json(data);
+            res.status(200).json({
+                message: "Product Updated",
+                request: {
+                    type: "GET",
+                    url: "http://localhost:3000/products/" + idToUpdate
+                }
+            });
         })
         .catch(err => {
             console.error(err);
@@ -92,7 +127,17 @@ router.delete('/:productID', (req, res, next) => {
     const idTodelete = req.params.productID;
     Product.remove({ _id: idTodelete }).exec()
         .then(data => {
-            res.status(200).json(data)
+            res.status(200).json({
+                message: "Product Deleted",
+                reqest: {
+                    type: 'POST',
+                    url: "http://localhost:3000:/products/",
+                    data: {
+                        name: "String",
+                        price: "Number"
+                    }
+                }
+            })
         }).catch(error => {
             console.error(error);
             res.status(500).json(error);

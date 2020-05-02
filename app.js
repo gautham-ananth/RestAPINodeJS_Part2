@@ -16,6 +16,8 @@ mongoose.connect(
         console.log(mongoose.connection.port);
     })
 
+//removes the deprication warning
+mongoose.Promise = global.Promise;
 
 //use morgon for logging
 app.use(morgan('dev'));
